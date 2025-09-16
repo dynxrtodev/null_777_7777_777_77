@@ -1,7 +1,7 @@
 -- [[
 --  * Seventyn Multi SC
 --  * VERSION : 1.1 
---  * LAUNCHER : BOTHAX
+--  * LAUNCHER : GROWLAUNCHER
 --  * SERVER : GTFY
 --  * Cr @Svntyn ⃤
 -- ]]
