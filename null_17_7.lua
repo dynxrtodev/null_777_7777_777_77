@@ -454,18 +454,6 @@
 ---77787877871817181817181717118718118171818198191819181
 ---77787877871817181817181717118718118171818198191819181
 ---77787877871817181817181717118718118171818198191819181
----77787877871817181817181717118718118171818198191819181
----77787877871817181817181717118718118171818198191819181
----77787877871817181817181717118718118171818198191819181
----77787877871817181817181717118718118171818198191819181
----77787877871817181817181717118718118171818198191819181
----77787877871817181817181717118718118171818198191819181
----77787877871817181817181717118718118171818198191819181
----77787877871817181817181717118718118171818198191819181
----77787877871817181817181717118718118171818198191819181
----77787877871817181817181717118718118171818198191819181
----77787877871817181817181717118718118171818198191819181
----77787877871817181817181717118718118171818198191819181
 
 local Booth = { 
   running = false,
@@ -665,7 +653,7 @@ add_quick_exit
 end
 
 --- H
-addHook("OnsendPacket", "SVMS_Commands", function(type, packet)
+addHook("OnSendPacket", "SVMS_Commands", function(type, packet)
     if type ~= 2 then return end
     local text = packet:match("text|(.+)")
     if not text then return end
@@ -809,17 +797,17 @@ end
     
     local amount = tonumber(num) or 1
     if cmd == "/dbgl" then
-        sendPacket(2, "action|dialog_return\ndialog_name|drop_item\nitemID|7188|\ncount|"..amount)
+        SendPacket(2, "action|dialog_return\ndialog_name|drop_item\nitemID|7188|\ncount|"..amount)
         logMessage("Dropped "..amount.." BGL")
         return true
     end
     if cmd == "/ddl" then
-        sendPacket(2, "action|dialog_return\ndialog_name|drop_item\nitemID|1796|\ncount|"..amount)
+        SendPacket(2, "action|dialog_return\ndialog_name|drop_item\nitemID|1796|\ncount|"..amount)
         logMessage("Dropped "..amount.." DL")
         return true
     end
     if cmd == "/dwl" then
-        sendPacket(2, "action|dialog_return\ndialog_name|drop_item\nitemID|242|\ncount|"..amount)
+        SendPacket(2, "action|dialog_return\ndialog_name|drop_item\nitemID|242|\ncount|"..amount)
         logMessage("Dropped "..amount.." WL")
         return true
     end
@@ -828,7 +816,7 @@ end
                     "dialog_name|my_bank_account\n" ..
                     "buttonClicked|depo_true\n" ..
                     "bgl_|"..amount
-        sendPacket(2, pkt)
+        SendPacket(2, pkt)
         logMessage("Deposited "..amount.." BGL")
         return true
     end
@@ -837,7 +825,7 @@ end
                     "dialog_name|my_bank_account\n" ..
                     "buttonClicked|wd_true\n" ..
                     "wd_|"..amount
-        sendPacket(2, pkt)
+        SendPacket(2, pkt)
         logMessage("Withdrew "..amount.." BGL")
         return true
     end
@@ -847,7 +835,7 @@ end
                     "dialog_name|drop_item\n" ..
                     "itemID|"..id.."|\n" ..
                     "count|"..count
-        sendPacket(2, pkt)
+        SendPacket(2, pkt)
     end
 
     local function getAmount(id)
@@ -873,26 +861,26 @@ end
     if totalWL > 0 then
         logMessage("`e[ SVMS ] `8Dropping "..totalWL.." WLs...")
         dropItem(DAW.wl, totalWL)
-        sleep(DAW.delay)
+        Sleep(DAW.delay)
     end
     if totalDL > 0 then
         logMessage("`e[ SVMS ] `cDropping "..totalDL.." DLs...")
         dropItem(DAW.dl, totalDL)
-        sleep(DAW.delay)
+        Sleep(DAW.delay)
     end
     if totalBGL > 0 then
         logMessage("`e[ SVMS ] Dropping "..totalBGL.." BGLs...")
         dropItem(DAW.bgl, totalBGL)
-        sleep(DAW.delay)
+        Sleep(DAW.delay)
     end
 
     logMessage("`e[ SVMS ] All WL/DL/BGL dropped.")
     return true
 end 
     if cmd == "/donate" then
-        createThread(function()
-            sendPacket(3, "action|join_request\nname|svms\ninvitedWorld|0")
-            sleep(1500)
+        runThread(function()
+            SendPacket(3, "action|join_request\nname|svms\ninvitedWorld|0")
+            Sleep(1500)
             local pkt = "action|dialog_return\n" ..
                         "dialog_name|give_item\n" ..
                         "itemID|7188|\n" ..
@@ -901,7 +889,7 @@ end
                         "buttonClicked|give\n" ..
                         "count|"..amount.."|\n" ..
                         "sign_text|"
-            sendPacket(2, pkt)
+            SendPacket(2, pkt)
             logMessage("Thanks For The Support!")
         end)
         return true
@@ -910,7 +898,7 @@ end
 end)
 
 --- F
-createThread(function()
+runThread(function()
     while true do
         local currentTime = os.clock() * 1000
         local me = GetLocal()
@@ -921,7 +909,7 @@ createThread(function()
             if (currentTime - VENDING.lastActionTime) >= VENDING.actionDelay then
                 if VENDING.state == 0 then
                     logMessage("Vending: joining shop "..VENDING.shopWorld)
-                    sendPacket(3, "action|join_request\nname|" .. VENDING.shopWorld .. "\ninvitedWorld|0")
+                    SendPacket(3, "action|join_request\nname|" .. VENDING.shopWorld .. "\ninvitedWorld|0")
                     VENDING.state = 1
                     VENDING.lastActionTime = currentTime
                     VENDING.actionDelay = 2000
@@ -934,7 +922,7 @@ createThread(function()
                         VENDING.actionDelay = 800
                     else
                         logMessage("Vending: not in shop yet, retry join")
-                        sendPacket(3, "action|join_request\nname|" .. VENDING.shopWorld .. "\ninvitedWorld|0")
+                        SendPacket(3, "action|join_request\nname|" .. VENDING.shopWorld .. "\ninvitedWorld|0")
                         VENDING.lastActionTime = currentTime
                         VENDING.actionDelay = 1500
                     end
@@ -948,13 +936,13 @@ createThread(function()
                                    "expectitem|"..VENDING.itemid.."|\n" ..
                                    "verify|1|\n"..
                                    "buycount|"..VENDING.buycount
-                    sendPacket(2, pktBuy)
+                    SendPacket(2, pktBuy)
                     VENDING.state = 3
                     VENDING.lastActionTime = currentTime
                     VENDING.actionDelay = 1000
                 elseif VENDING.state == 3 then
                     logMessage("Vending: join drop world "..VENDING.dropWorld)
-                    sendPacket(3, "action|join_request\nname|" .. VENDING.dropWorld .. "\ninvitedWorld|0")
+                    SendPacket(3, "action|join_request\nname|" .. VENDING.dropWorld .. "\ninvitedWorld|0")
                     VENDING.state = 4
                     VENDING.lastActionTime = currentTime
                     VENDING.actionDelay = 2000
@@ -967,7 +955,7 @@ createThread(function()
                         VENDING.actionDelay = 800
                     else
                         logMessage("Vending: not in drop world yet, retry join")
-                        sendPacket(3, "action|join_request\nname|" .. VENDING.dropWorld .. "\ninvitedWorld|0")
+                        SendPacket(3, "action|join_request\nname|" .. VENDING.dropWorld .. "\ninvitedWorld|0")
                         VENDING.lastActionTime = currentTime
                         VENDING.actionDelay = 2000
                     end
@@ -977,7 +965,7 @@ createThread(function()
                                     "dialog_name|drop_item\n" ..
                                     "itemID|"..VENDING.itemid.."|\n" ..
                                     "count|"..VENDING.buycount
-                    sendPacket(2, pktDrop)
+                    SendPacket(2, pktDrop)
                     VENDING.state = 0
                     VENDING.lastActionTime = currentTime
                     VENDING.actionDelay = 500
@@ -988,7 +976,7 @@ createThread(function()
         -- BOOTH
         if Booth.running then
             if currentTime - Booth.lastActionTime >= Booth.delay then
-                sendPacket(2, "action|dialog_return\ndialog_name|carnival_booth\ntilex|65|\ntiley|53|\nbuttonClicked|buy_"..Booth.itemid)
+                SendPacket(2, "action|dialog_return\ndialog_name|carnival_booth\ntilex|65|\ntiley|53|\nbuttonClicked|buy_"..Booth.itemid)
                 Booth.lastActionTime = currentTime
             end
         end
@@ -996,7 +984,7 @@ createThread(function()
         -- SHOP
         if Shop.running then
             if currentTime - Shop.lastActionTime >= Shop.delay then
-                sendPacket(2, "action|buy\nitem|"..Shop.itemid)
+                SendPacket(2, "action|buy\nitem|"..Shop.itemid)
                 Shop.lastActionTime = currentTime
             end
         end
@@ -1004,9 +992,9 @@ createThread(function()
         -- UT
         if UT.running then
             if currentTime - UT.lastActionTime >= UT.delay then
-                sendPacket(2, "action|dialog_return\ndialog_name|itemremovedfromsucker\ntilex|"..UT.tilex.."|\ntiley|"..UT.tiley.."|\nitemtoremove|"..UT.removeItem)
-                sleep(UT.delay/2)
-                sendPacket(2, "action|dialog_return\ndialog_name|drop_item\nitemID|"..UT.dropItem.."|\ncount|"..UT.dropCount)
+                SendPacket(2, "action|dialog_return\ndialog_name|itemremovedfromsucker\ntilex|"..UT.tilex.."|\ntiley|"..UT.tiley.."|\nitemtoremove|"..UT.removeItem)
+                Sleep(UT.delay/2)
+                SendPacket(2, "action|dialog_return\ndialog_name|drop_item\nitemID|"..UT.dropItem.."|\ncount|"..UT.dropCount)
                 UT.lastActionTime = currentTime
             end
         end
@@ -1022,7 +1010,7 @@ createThread(function()
                             "setprice|"..ADDVEND.price.."\n" ..
                             "chk_perlock|"..ADDVEND.perlock.."\n" ..
                             "chk_peritem|"..ADDVEND.peritem
-                sendPacket(2, pkt)
+                SendPacket(2, pkt)
                 ADDVEND.lastActionTime = currentTime
             end
         end
@@ -1033,9 +1021,9 @@ createThread(function()
                 if PNB.index <= PNB.far then
                     local tx = (PNB.direction == "right") and (px + PNB.index) or (px - PNB.index)
                     local ty = py
-                    sendPacketRaw(false, { type = 3, value = PNB.itemId, px = tx, py = ty, x = me.pos.x, y = me.pos.y })
+                    SendPacketRaw(false, { type = 3, value = PNB.itemId, px = tx, py = ty, x = me.pos.x, y = me.pos.y })
                     PNB.index = PNB.index + 1
-                    sleep(PNB.delay)
+                    Sleep(PNB.delay)
                 else
                     PNB.state = 1
                     PNB.index = 1
@@ -1044,9 +1032,9 @@ createThread(function()
                 if PNB.index <= PNB.far then
                     local tx = (PNB.direction == "right") and (px + PNB.index) or (px - PNB.index)
                     local ty = py
-                    sendPacketRaw(false, { type = 3, value = 18, px = tx, py = ty, x = me.pos.x, y = me.pos.y })
+                    SendPacketRaw(false, { type = 3, value = 18, px = tx, py = ty, x = me.pos.x, y = me.pos.y })
                     PNB.index = PNB.index + 1
-                    sleep(PNB.delay)
+                    Sleep(PNB.delay)
                 else
                     PNB.state = 0
                     PNB.index = 1
@@ -1085,7 +1073,7 @@ createThread(function()
                         MIRRORMAZE.actionDelay = 400
                     elseif MIRRORMAZE.state == 1 then
                         if px_now == MIRRORMAZE.doorX and py_now == MIRRORMAZE.doorY then
-                            sendPacketRaw(false, { type = 7, value = 18, px = MIRRORMAZE.doorX, py = MIRRORMAZE.doorY })
+                            SendPacketRaw(false, { type = 7, value = 18, px = MIRRORMAZE.doorX, py = MIRRORMAZE.doorY })
                             MIRRORMAZE.state = 2
                             MIRRORMAZE.lastActionTime = currentTime
                             MIRRORMAZE.actionDelay = 1000
@@ -1109,7 +1097,7 @@ createThread(function()
                         MIRRORMAZE.actionDelay = 200
                         if MIRRORMAZE.count >= 100 then
                             logMessage("Mirrormaze: reached 100 cycles, resting 5s")
-                            sleep(5000)
+                            Sleep(5000)
                             MIRRORMAZE.count = 0
                         end
                     end
@@ -1137,10 +1125,10 @@ createThread(function()
                 if tile and tile.fg == 0 then
                     if math.abs(px - PLANT.currentX) > 2 or math.abs(py - PLANT.currentY) > 2 then
                         FindPath(PLANT.currentX, PLANT.currentY)
-                        sleep(200)
+                        Sleep(200)
                     end
                     local pkt = { type = 3, value = PLANT.seedid, px = PLANT.currentX, py = PLANT.currentY, x = me.pos.x, y = me.pos.y }
-                    sendPacketRaw(false, pkt)
+                    SendPacketRaw(false, pkt)
                     if ((PLANT.currentX + PLANT.currentY) % PLANT.logInterval) == 0 then
                         logMessage("Planted at "..PLANT.currentX..","..PLANT.currentY)
                     end
@@ -1165,6 +1153,6 @@ createThread(function()
             end
         end
 
-        sleep(5)
+        Sleep(5)
     end
 end)
