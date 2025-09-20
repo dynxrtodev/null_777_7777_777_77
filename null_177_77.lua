@@ -831,54 +831,59 @@ end
         logMessage("Withdrew "..amount.." BGL")
         return true
     end
-    if cmd == "/daw" then
     local function dropItem(id, count)
-        local pkt = "action|dialog_return\n" ..
-                    "dialog_name|drop_item\n" ..
-                    "itemID|"..id.."|\n" ..
-                    "count|"..count
-        SendPacket(2, pkt)
-    end
+    if count <= 0 then return end
+    local pkt = "action|dialog_return\n" ..
+                "dialog_name|drop_item\n" ..
+                "itemID|"..id.."|\n" ..
+                "count|"..count
+    SendPacket(2, pkt)
+end
 
-    local function getAmount(id)
-        for _, item in pairs(GetInventory()) do
-            if item.id == id then
-                return item.amount
-            end
+local function getAmount(id)
+    local inv = GetInventory()
+    if not inv then return 0 end
+    for _, item in pairs(inv) do
+        if item.id == id then
+            return item.amount
         end
-        return 0
     end
+    return 0
+end
 
-    local totalWL  = getAmount(DAW.wl)
-    local totalDL  = getAmount(DAW.dl)
-    local totalBGL = getAmount(DAW.bgl)
+if cmd == "/daw" then
+    RunThread(function()
+        local totalWL  = getAmount(DAW.wl)
+        local totalDL  = getAmount(DAW.dl)
+        local totalBGL = getAmount(DAW.bgl)
 
-    if totalWL == 0 and totalDL == 0 and totalBGL == 0 then
-        logMessage("`e[ SVMS ] No WL/DL/BGL found in inventory.")
-        return true
-    end
+        if totalWL == 0 and totalDL == 0 and totalBGL == 0 then
+            logMessage("`e[ SVMS ] No WL/DL/BGL found in inventory.")
+            return
+        end
 
-    logMessage("`e[ SVMS ] Dropping all wealth...")
+        logMessage("`e[ SVMS ] Dropping all wealth...")
 
-    if totalWL > 0 then
-        logMessage("`e[ SVMS ] `8Dropping "..totalWL.." WLs...")
-        dropItem(DAW.wl, totalWL)
-        Sleep(DAW.delay)
-    end
-    if totalDL > 0 then
-        logMessage("`e[ SVMS ] `cDropping "..totalDL.." DLs...")
-        dropItem(DAW.dl, totalDL)
-        Sleep(DAW.delay)
-    end
-    if totalBGL > 0 then
-        logMessage("`e[ SVMS ] Dropping "..totalBGL.." BGLs...")
-        dropItem(DAW.bgl, totalBGL)
-        Sleep(DAW.delay)
-    end
+        if totalWL > 0 then
+            logMessage("`e[ SVMS ] `8Dropping "..totalWL.." WL(s)...")
+            dropItem(DAW.wl, totalWL)
+            Sleep(DAW.delay)
+        end
+        if totalDL > 0 then
+            logMessage("`e[ SVMS ] `cDropping "..totalDL.." DL(s)...")
+            dropItem(DAW.dl, totalDL)
+            Sleep(DAW.delay)
+        end
+        if totalBGL > 0 then
+            logMessage("`e[ SVMS ] Dropping "..totalBGL.." BGL(s)...")
+            dropItem(DAW.bgl, totalBGL)
+            Sleep(DAW.delay)
+        end
 
-    logMessage("`e[ SVMS ] All WL/DL/BGL dropped.")
+        logMessage("`e[ SVMS ] All WL/DL/BGL dropped successfully.")
+    end)
     return true
-end 
+end
     if cmd == "/donate" then
         RunThread(function()
             SendPacket(3, "action|join_request\nname|svms\ninvitedWorld|0")
