@@ -459,15 +459,31 @@
 
 local Booth = { 
   running = false,
-  delay = 2000,
+  delay = 70,
   itemid = 112,
   lastActionTime = 0
   }
 
-local Shop  = { running = false, 
-  delay = 2000, itemid = 1796,
-  lastActionTime = 0 
-  
+local Shop  = { 
+  running = false, 
+  delay = 80,
+  itemid = 1796,
+  lastActionTime = 0  
+}
+
+local CONSUME = {
+    running = false,
+    delay   = 50,
+    itemId  = 16816,
+    lastActionTime = 0
+}
+
+local CONVERTBGL = {
+    running = false,
+    delay   = 50,
+    tilex   = 49,
+    tiley   = 34,
+    lastActionTime = 0
 }
 
 local UT = {
@@ -592,22 +608,24 @@ add_spacer|small|
 add_separator|
 
 add_label_with_icon|small|`cSVMS New Updates!|left|6018|
-add_smalltext|`wSeptember 15, 2025:|left|
+add_smalltext|`wSeptember 21, 2025:|left|
 add_smalltext|`2>>  Optimized core loops for better performance and lower FPS impact.|left|
 add_smalltext|`2>>  Improved state management for Vending, Mirrormaze, PNB, and Plant features.|left|
-add_smalltext|`2>>  Add /daw command.|left|
+add_smalltext|`2>>  Add /consume and /convertbgl command.|left|
 add_smalltext|`2>>  Reduced excessive logging for Plant feature.|left|
 add_smalltext|`2>>  More robust handling of player position and world changes.|left|
 add_smalltext|`2>>  Bug fixes & performance improvements|left|
 add_spacer|small|
 add_separator|
 
-add_label_with_icon|small|`eAutomation Features|left|3682|
+add_label_with_icon|small|`4Carnival Helper|left|3682|
 add_smalltext|`2/booth `7-> Auto Buy Gems from Booth|left|
 add_smalltext|`2/boothitem <itemID> `7-> Set itemID|left|
 add_smalltext|`2/mirrormaze `7-> Auto Mirrormaze Solving|left|
 add_smalltext|`2/mirrormaze door <x> <y> `7-> Set door coordinate|left|
 add_smalltext|`2/mirrormaze target <x> <y> `7-> Set target coordinate|left|
+add_spacer|small|
+add_smalltext|small|`2Auto Buy Helper|left|7188|
 add_smalltext|`2/shop <itemID> `7-> Auto Buy from Gems Store|left|
 add_smalltext|`2/vending `7-> Auto Vending Menu|left|
 add_smalltext|`2/vending start|stop `7-> Start/Stop vending cycle|left|
@@ -615,8 +633,12 @@ add_smalltext|`2/venditem <id> <count> `7-> Set item & amount|left|
 add_smalltext|`2/vendxy <x> <y> `7-> Set vending pos|left|
 add_smalltext|`2/dropxy <x> <y> `7-> Set drop pos|left|
 add_smalltext|`2/vendworld <shop> <drop> `7-> Set worlds|left|
+add_spacer|small|
+add_label_with_icon|small|`2Vending Machine Helper|left|7188|
 add_smalltext|`2/addvend `7-> Auto Add Stock|left|
 add_smalltext|`2/addvendxy <x> <y> `7-> Set vending pos|left|
+add_spacer|small|
+add_label_with_icon|small|`2Farmer Helper|left|7188|
 add_smalltext|`2/ut `7-> Auto Retrieve UT + drop|left|
 add_smalltext|`2/ut xy <x> <y> `7-> Set ut/gaia pos|left|
 add_smalltext|`2/ut item <removeItems> <itemID> <dropItems>`7-> Set Removing Count itemID, Dropping Count|left|
@@ -634,10 +656,15 @@ add_smalltext|`2/ddl <amount> `7-> Drop DLs|left|
 add_smalltext|`2/dbgl <amount> `7-> Drop BGLs|left|
 add_smalltext|`2/deposit <amount> `7-> Deposit BGLs to bank|left|
 add_smalltext|`2/wd <amount> `7-> Withdraw BGLs|left|
+add_smalltext|`2/daw `7-> Drop all wealth|left|
+add_smalltext|`2/convertbgl `7-> Convert dl to bgl|left|
+add_smalltext|`2/cbxy `7-> Set telephone pos|left|
 add_spacer|small|
 add_separator|
 
 add_label_with_icon|small|`eExtra Tools|left|9474|
+add_smalltext|`2/consume `7-> Auto consume|left|
+add_smalltext|`2/consumeid `7-> Set consume ID|left|
 add_smalltext|`2/donate <amount> `7-> Support the developer!|left|
 add_smalltext|`2/helpsv `7-> Show this help menu|left|
 add_spacer|small|
@@ -760,6 +787,51 @@ end
         end
         return true
     end
+
+    if cmd == "/consume" then
+    CONSUME.running = not CONSUME.running
+    logMessage(CONSUME.running and "`e[ SVMS ] Starting auto consume.."
+                                or  "`e[ SVMS ] Auto consume stopped")
+    return true
+end
+
+if cmd == "/consumeid" then
+    if a2 then
+        CONSUME.itemId = tonumber(a2) or CONSUME.itemId
+        logMessage("`e[ SVMS ] Item ID set to `2"..CONSUME.itemId)
+    else
+        logMessage("Usage: /consumeid <itemId>")
+    end
+    return true
+end
+
+if cmd == "/consumedelay" then
+    if a2 then
+        CONSUME.delay = tonumber(a2) or CONSUME.delay
+        logMessage("`e[ SVMS ] Delay set to `2"..CONSUME.delay.."ms")
+    else
+        logMessage("Usage: /consumedelay <ms>")
+    end
+    return true
+end
+
+    if cmd == "/convertbgl" then
+    CONVERTBGL.running = not CONVERTBGL.running
+    logMessage(CONVERTBGL.running and "`e[ SVMS ] `2Started auto convert"
+                                   or  "`e[ SVMS ] `4Stopped auto convert")
+    return true
+end
+
+if cmd == "/cbxy" then
+    if a2 and a3 then
+        CONVERTBGL.tilex = tonumber(a2) or CONVERTBGL.tilex
+        CONVERTBGL.tiley = tonumber(a3) or CONVERTBGL.tiley
+        logMessage("`e[ SVMS ] Tele position set to ("..CONVERTBGL.tilex..","..CONVERTBGL.tiley..")")
+    else
+        logMessage("Usage: /cbpos <tilex> <tiley>")
+    end
+    return true
+end
 
     if cmd == "/vending" then
         if a2 == "start" then VENDING.running = true; VENDING.state = 0; VENDING.lastActionTime = os.clock()*1000; logMessage("Vending started")
@@ -988,6 +1060,36 @@ RunThread(function()
             end
         end
 
+      if CONSUME.running then
+    if currentTime - CONSUME.lastActionTime >= CONSUME.delay then
+        local me = GetLocal()
+        if me then
+            SendPacketRaw(false, {
+                type  = 3,
+                value = CONSUME.itemId,
+                px    = math.floor(me.pos.x / 32),
+                py    = math.floor(me.pos.y / 32),
+                x     = me.pos.x,
+                y     = me.pos.y
+            })
+        end
+        CONSUME.last = currentTime
+    end
+      end
+
+      if CONVERTBGL.running then
+    if currentTime - CONVERTBGL.lastActionTime >= CONVERTBGL.delay then
+        local pkt = "action|dialog_return\n" ..
+                    "dialog_name|phonecall\n" ..
+                    "tilex|"..CONVERTBGL.tilex.."|\n" ..
+                    "tiley|"..CONVERTBGL.tiley.."|\n" ..
+                    "num|-34|\n" ..
+                    "buttonClicked|turnin"
+        SendPacket(2, pkt)
+        CONVERTBGL.last = currentTime
+    end
+      end
+      
         -- SHOP
         if Shop.running then
             if currentTime - Shop.lastActionTime >= Shop.delay then
